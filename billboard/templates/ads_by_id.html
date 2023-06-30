@@ -1,0 +1,52 @@
+<!--  наследуемся от шаблона ads.html, который мы создавали для flatpages -->
+{% extends 'flatpages/default.html' %}
+
+
+<!-- Название у нас будет products -->
+{% block title %}
+AdsByDetail
+{% endblock title %}
+
+<!-- В контенте на странице мы выводим все новости -->
+{% block content %}
+<h1>{{ ads.date_time|date:'d.M.Y' }}</h1>
+<br>
+<br>
+
+<h1>{{ ads.title }}
+{% for category in ads.category.all %}
+<h2>(Category: {{ category }})</h2>
+{% endfor %}</h1>
+<hr>
+<h2>{{ ads.text }}</h2>
+<hr>
+<br>
+<br>
+<h2>Add a comment:</h2>
+<br>
+<form action="add_comment/" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="OK" />
+</form>
+<br>
+<br>
+<h1>FEEDBACK:</h1>
+{% for comment in comments %}
+<hr>
+<h2>{{ comment.text }}</h2>
+{% endfor %}
+<hr>
+<!--{% for category in news.category.all %}-->
+<!--<h3>-->
+<!--    {{ category.name }}-->
+<!--    {% if not is_subscribed %}-->
+<!--    <button> <a href="subscribe/">Подписаться</a> </button>-->
+<!--    {% else %}-->
+<!--    Вы подписаны на {{ category.name }}-->
+<!--    {% endif %}-->
+
+<!--</h3>-->
+<!--{% endfor %}-->
+
+{% endblock content %}

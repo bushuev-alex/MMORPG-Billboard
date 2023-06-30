@@ -1,0 +1,46 @@
+from board.models import *
+
+# Создать двух пользователей (с помощью метода User.objects.create_user('username')).
+alex = User.objects.create_user('Alex')
+vova = User.objects.create_user('Vova')
+
+# Создать два объекта модели Author, связанные с пользователями.
+auth_alex = Author.objects.create(user=alex)
+auth_vova = Author.objects.create(user=vova)
+
+# Добавить 10 категории в модель Category.
+cat1 = Category.objects.create(name='TA')
+cat2 = Category.objects.create(name='HI')
+cat3 = Category.objects.create(name='DD')
+cat4 = Category.objects.create(name='TR')
+cat5 = Category.objects.create(name='GD')
+cat6 = Category.objects.create(name='QG')
+cat7 = Category.objects.create(name='BS')
+cat8 = Category.objects.create(name='TN')
+cat9 = Category.objects.create(name='CO')
+cat10 = Category.objects.create(name='MA')
+
+
+# Добавить 4 advertisements.
+ad1 = Advertisement.objects.create(author=auth_alex, title="Title Ad1", text="""Text Ad1.""")
+ad2 = Advertisement.objects.create(author=auth_alex, title="Title Ad2", text="""Text Ad2.""")
+ad3 = Advertisement.objects.create(author=auth_vova, title="Title Ad3", text="""Text Ad3.""")
+ad4 = Advertisement.objects.create(author=auth_vova, title="Title Ad4", text="""Text Ad4.""")
+
+
+# Присвоить им категории (как минимум в одной статье/новости должно быть не меньше 2 категорий).
+AdvertisementCategory.objects.create(advertisement=ad1, category=cat2)
+AdvertisementCategory.objects.create(advertisement=ad2, category=cat1)
+AdvertisementCategory.objects.create(advertisement=ad3, category=cat10)
+AdvertisementCategory.objects.create(advertisement=ad4, category=cat7)
+
+
+# Создать как минимум 4 комментария к разным объектам модели Post (в каждом объекте должен быть как минимум один комментарий).
+comm1 = Feedback.objects.create(advertisement=ad1, user=vova, text='Comment Ad1')
+comm2 = Feedback.objects.create(advertisement=ad2, user=vova, text='Comment Ad2')
+comm3 = Feedback.objects.create(advertisement=ad3, user=alex, text='Comment Ad3')
+comm4 = Feedback.objects.create(advertisement=ad4, user=alex, text='Comment Ad4')
+
+
+
+

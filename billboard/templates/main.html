@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+    {% load i18n %}
+
+<html lang="en">
+    <head>
+        <title>{% trans "Simple" %} {% trans "SignUp" %}/{% trans "SignIn" %} {% trans "app" %}</title>
+    </head>
+    <body>
+        <!-- Language change form -->
+        <div>
+            <h1><a href="/">{% trans "Simple" %} {% trans "SignUp" %}/{% trans "SignIn" %} {% trans "app" %}</a></h1>
+        </div>
+        {% block content %}
+        {% endblock %}
+    </body>
+</html>

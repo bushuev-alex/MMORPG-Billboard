@@ -1,0 +1,83 @@
+{% extends 'flatpages/default.html' %}
+{% load i18n %}
+{% load tz %}
+
+{% block title %}
+{% trans "Search comments" %}
+{% endblock title %}
+
+
+{% block content %}
+
+    {% block search_form %}
+    {# Добавляем форму, которая объединяет набор полей, которые будут отправляться в запросе #}
+    <form action="" method="get">
+       {# Переменная, которую мы передали через контекст, может сгенерировать нам форму с полями #}
+       {{ filterset.form.as_p }}
+       {# Добавим кнопку отправки данных формы #}
+       <input type="submit" value="{% trans 'Search' %}" />
+    </form>
+    <hr>
+    {% endblock search_form %}
+
+    {% if comments %}
+        <table>
+            <tr>
+<!--               <td>category</td>-->
+<!--               <td>{% trans "ID" %}</td>-->
+<!--               <td>{% trans "AUTHOR" %}</td>-->
+<!--               <td>{% trans "DATE" %}</td>-->
+                <td>{% trans "Ad" %}</td>
+                <td>{% trans "User" %}</td>
+                <td>{% trans "Text" %}</td>
+                <td>{% trans "Action" %}</td>
+            </tr>
+            {% for comment in comments %}
+            <tr>
+<!--               <td>{{ s_news.category.name }}</td>-->
+<!--               <td>{{ one_ad.id }}</td>-->
+<!--               <td>{{ one_ad.author.user.username }}</td>-->
+<!--               <td>{{ one_ad.date_time|date:'d M Y' }}</td>-->
+                <td>{{ comment.advertisement }}</td>
+                <td>{{ comment.user }}</td>
+                <td>{{ comment.text }}</td>
+                <td>{% if not comment.accepted %}
+                    <a href="{% url 'accept_comment' comment.id %}">Accept</a>
+                    {% endif %}
+                    <a href="{% url 'delete_comment' comment.id %}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+
+        </table>
+    {% else %}
+        <h2>{% trans "Products" %} {% trans "are" %} {% trans "not" %} {% trans "available" %}!</h2>
+    {% endif %}
+
+
+        {# Добавляем пагинацию на страницу #}
+    <hr>
+    {# Информация о предыдущих страницах #}
+    {% if page_obj.has_previous %}
+        <a href="?page=1">1</a>
+        {% if page_obj.previous_page_number != 1 %}
+            ...
+            <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+        {% endif %}
+    {% endif %}
+
+    {# Информация о текущей странице #}
+    {{ page_obj.number }}
+
+    {# Информация о следующих страницах #}
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+        {% if paginator.num_pages != page_obj.next_page_number %}
+            ...
+            <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+        {% endif %}
+    {% endif %}
+
+{% endblock content %}
+
+
