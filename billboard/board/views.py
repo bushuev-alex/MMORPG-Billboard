@@ -3,6 +3,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext
+from django.core.mail import send_mail
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import User
@@ -23,14 +24,14 @@ from pprint import pprint
 from board.filters import FeedbackFilter
 from board.forms import FeedbackForm, AdvertisementForm
 # from board.utils import too_many_posts, msg
-# from board.signals import notify_about_new_creation, printer2
+from board.signals import notify_about_new_comment, printer2
 # from board.tasks import printer
 # from board.serializers import *
 
 from board.models import *
 
 
-# LIST OF ADs
+# LIST ADs
 class AdList(ListView):
     model = Advertisement  # Указываем модель, объекты которой мы будем выводить
     ordering = '-date_time'  # Поле, которое будет использоваться для сортировки объектов
@@ -44,7 +45,7 @@ class AdList(ListView):
         return context
 
 
-# CREATE
+# CREATE AD
 class AdCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     permission_required = ('board.add_advertisement',)
     form_class = AdvertisementForm
@@ -53,12 +54,7 @@ class AdCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         advertisement = form.save(commit=True)
-
-
-        # if too_many_posts(model=self.model, post=post):
-        #     return HttpResponse(msg)
-        # else:
-        # notify_about_new_creation.delay(post.pk)
+        # notify_about_new_creation.delay(advertisement.pk)
         return super().form_valid(form)
 
 
@@ -75,15 +71,19 @@ class AdDetail(DetailView):
         return context
 
     def post(self, request, *args, **kwargs):
+        # form = FeedbackForm(request.POST or None)
         text = request.POST.get("text")
         user = request.user
-        Feedback.objects.create(advertisement=self.model.objects.filter(id=self.kwargs['pk'])[0],
-                                user=user,
-                                text=text)
+        advertisement = self.model.objects.filter(id=self.kwargs['pk'])[0]
+        comment = Feedback.objects.create(advertisement=advertisement,
+                                          user=user,
+                                          text=text)
+
+        # notify_about_new_comment.delay(comment.pk, advertisement.pk)
         return redirect(f"/board/{self.kwargs['pk']}/")
 
 
-# LIST OF Comments
+# LIST Comments
 class Comments(LoginRequiredMixin, ListView):
     model = Feedback
     ordering = "-date_time"
@@ -105,7 +105,7 @@ class Comments(LoginRequiredMixin, ListView):
         return context
 
 
-# ACCEPT
+# ACCEPT Comments
 @login_required
 def accept(request, pk):
     comment = Feedback.objects.get(id=pk)
@@ -115,7 +115,7 @@ def accept(request, pk):
     return redirect('comments')
 
 
-# DELETE
+# DELETE Comments
 @login_required
 def delete(request, pk):
     comment = Feedback.objects.get(id=pk)
