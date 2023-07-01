@@ -3,7 +3,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import User
@@ -24,7 +24,7 @@ from pprint import pprint
 from board.filters import FeedbackFilter
 from board.forms import FeedbackForm, AdvertisementForm
 # from board.utils import too_many_posts, msg
-from board.signals import notify_about_new_comment, printer2
+from board.signals import notify_about_new_comment, notify_about_comment_accepted
 # from board.tasks import printer
 # from board.serializers import *
 
@@ -58,6 +58,30 @@ class AdCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
+# UPDATE AD
+class AdUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = ('board.view_advertisement', 'board.change_advertisement',)
+    form_class = AdvertisementForm
+    model = Advertisement
+    template_name = "ads_edit.html"
+
+    def form_valid(self, form):
+        advertisement = form.save(commit=True)
+        return super().form_valid(form)
+
+
+# DELETE
+class AdDelete(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
+    permission_required = ('board.view_advertisement', 'board.delete_advertisement')
+    model = Advertisement
+    template_name = "ads_delete.html"
+    success_url = reverse_lazy('ad_list')
+
+    def form_valid(self, form):
+        obj = self.get_object()
+        return super().form_valid(form)
+
+
 # DETAIL AD
 class AdDetail(DetailView):
     model = Advertisement
@@ -66,20 +90,36 @@ class AdDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['comments'] = Feedback.objects.filter(advertisement=self.kwargs['pk']).order_by('-date_time')
+        comments_ordered_by_date = Feedback.objects.filter(advertisement=self.kwargs['pk']).order_by('-date_time')
+        context['comments'] = comments_ordered_by_date
         context['form'] = FeedbackForm
+        context['user_is_author'] = False
+        context['user'] = self.request.user
+        if self.request.user == self.model.objects.get(id=self.kwargs['pk']).author.user:
+            context['user_is_author'] = True
         return context
 
+    # @login_required
     def post(self, request, *args, **kwargs):
-        # form = FeedbackForm(request.POST or None)
         text = request.POST.get("text")
         user = request.user
         advertisement = self.model.objects.filter(id=self.kwargs['pk'])[0]
         comment = Feedback.objects.create(advertisement=advertisement,
                                           user=user,
                                           text=text)
-
         # notify_about_new_comment.delay(comment.pk, advertisement.pk)
+        html_content = render_to_string(template_name='comment_created_email.html',
+                                        context={'comment': comment}
+                                        )
+        # send_mail
+        msg = EmailMultiAlternatives(subject=f"New comment to advertisement: {advertisement.title}",
+                                     body=comment.text,
+                                     # это то же, что и messag  # message=f"{comment.text}",
+                                     from_email=settings.DEFAULT_FROM_EMAIL,
+                                     to=[advertisement.author.user.email]
+                                     )
+        msg.attach_alternative(html_content, "text/html")  # добавляем html
+        msg.send()  # отсылаем
         return redirect(f"/board/{self.kwargs['pk']}/")
 
 
@@ -111,6 +151,7 @@ def accept(request, pk):
     comment = Feedback.objects.get(id=pk)
     comment.accepted = True
     comment.save()
+    notify_about_comment_accepted(comment.pk)
     message = "You successfully accept a comment"
     return redirect('comments')
 

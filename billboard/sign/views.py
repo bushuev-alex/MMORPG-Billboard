@@ -19,7 +19,7 @@ class BaseRegisterView(CreateView):
 @login_required
 def upgrade_me(request):
     user = request.user
-    author_group = Group.objects.get(name='premium')
+    basic_group = Group.objects.get(name='premium')
     if not request.user.groups.filter(name='premium').exists():
-        author_group.user_set.add(user)
+        basic_group.user_set.add(user)
     return redirect('/')

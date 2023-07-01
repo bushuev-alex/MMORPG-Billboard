@@ -13,15 +13,33 @@ AdsByDetail
 <br>
 <br>
 
-<h1>{{ ads.title }}
+<h1>Title: {{ ads.title }}</h1>
+
+
 {% for category in ads.category.all %}
 <h2>(Category: {{ category }})</h2>
 {% endfor %}</h1>
+
+
 <hr>
-<h2>{{ ads.text }}</h2>
+<h2>Text: {{ ads.text }}</h2>
 <hr>
+
+
+{% if user_is_author %}
+<button>
+    <a href="update/">Edit Advertisement</a>
+</button>
+<button>
+    <a href="delete/">Delete Advertisement</a>
+</button>
+{% endif %}
+
+
 <br>
 <br>
+
+{% if user.is_authenticated %}
 <h2>Add a comment:</h2>
 <br>
 <form action="add_comment/" method="post">
@@ -29,6 +47,8 @@ AdsByDetail
     {{ form }}
     <input type="submit" value="OK" />
 </form>
+{% endif %}
+
 <br>
 <br>
 <h1>FEEDBACK:</h1>
