@@ -14,8 +14,6 @@ class BaseRegisterView(CreateView):
     success_url = '/'
 
 
-
-
 @login_required
 def upgrade_me(request):
     user = request.user

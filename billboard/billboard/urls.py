@@ -15,6 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.views.generic import TemplateView
 from django.urls import path, include
 
 urlpatterns = [
@@ -25,6 +26,7 @@ urlpatterns = [
 
     path('pages/', include('django.contrib.flatpages.urls')),
     path('board/', include('board.urls')),
-
+    path('swagger-ui/', TemplateView.as_view(template_name='swagger-ui.html', extra_context={'schema_url':'openapi-schema'}), name='swagger-ui'),
+    path('editor/', include('django_summernote.urls')),
 
 ]

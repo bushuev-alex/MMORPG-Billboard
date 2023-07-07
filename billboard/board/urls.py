@@ -1,7 +1,9 @@
 from django.contrib import admin
+from django.views.generic import TemplateView
+from django.conf.urls.static import serve
 from django.urls import path, include
 from board.views import AdList, AdDetail, AdCreate, AdUpdate, AdDelete, Comments, delete, accept
-
+from billboard import settings
 # from rest_framework import routers
 
 
@@ -16,3 +18,9 @@ urlpatterns = [
     path('<int:pk>/accept/', accept, name='accept_comment'),
     path('<int:pk>/decline/', delete, name='delete_comment'),
 ]
+
+
+# add condition in django urls file
+if settings.DEBUG:
+    urlpatterns += [path(settings.MEDIA_URL[1:], serve, {"document_root": settings.MEDIA_ROOT})]
+# static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
