@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.flatpages",
 
+    "django_apscheduler",
+
     "fpages",
     "board",
     "accounts",

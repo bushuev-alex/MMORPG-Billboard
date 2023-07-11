@@ -13,7 +13,7 @@ class AdvertisementForm(forms.ModelForm):
 
     class Meta:
         model = Advertisement
-        fields = ["author", "category", "title", "text"]
+        fields = ['author', "category", "title", "text"]
 
     def clean(self):
         cleaned_data = super().clean()

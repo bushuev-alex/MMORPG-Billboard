@@ -1,22 +1,22 @@
 from django.template.loader import render_to_string
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.utils.translation import gettext
+# from django.utils.decorators import method_decorator
+# from django.utils.translation import gettext
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
+# from django.contrib.auth.models import User
+# from django.contrib.auth import get_user_model
 from django.urls import reverse, reverse_lazy
-from django.http import Http404, HttpResponse
-from django.views import View
+# from django.http import Http404, HttpResponse
+# from django.views import View
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 from django.conf import settings
 
-from datetime import datetime
-import pytz
-from pprint import pprint
+# from datetime import datetime
+# import pytz
+# from pprint import pprint
 
 # from rest_framework import viewsets
 # from rest_framework import permissions
@@ -70,7 +70,7 @@ class AdUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-# DELETE
+# DELETE AD
 class AdDelete(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
     permission_required = ('board.view_advertisement', 'board.delete_advertisement')
     model = Advertisement

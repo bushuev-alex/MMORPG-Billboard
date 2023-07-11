@@ -5,10 +5,10 @@
     <title>Notification</title>
 </head>
 <body>
-    <h2>Hello! New articlew for a week!</h2>
+    <h2>Hello! New advertisements for a day!</h2>
     <ul>
-        {% for post in posts %}
-        <li><a href="{{ link }}{{ post.get_absolute_url }}">{{ post.title }}</a></li>
+        {% for ad in ads %}
+        <li><a href="{{ link }}{{ ad.get_absolute_url }}">{{ ad.title }}</a></li>
         {% endfor %}
     </ul>
 </body>
